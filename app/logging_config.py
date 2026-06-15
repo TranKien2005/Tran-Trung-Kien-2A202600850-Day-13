@@ -57,3 +57,21 @@ def configure_logging() -> None:
 
 def get_logger() -> structlog.typing.FilteringBoundLogger:
     return structlog.get_logger()
+
+
+AUDIT_LOG_PATH = Path(os.getenv("AUDIT_LOG_PATH", "data/audit.jsonl"))
+
+def log_audit(event: str, actor: str, payload: dict[str, Any]) -> None:
+    import json
+    from datetime import datetime
+    AUDIT_LOG_PATH.parent.mkdir(parents=True, exist_ok=True)
+    audit_entry = {
+        "ts": datetime.utcnow().isoformat() + "Z",
+        "level": "info",
+        "service": "audit",
+        "event": event,
+        "actor": actor,
+        "payload": payload
+    }
+    with AUDIT_LOG_PATH.open("a", encoding="utf-8") as f:
+        f.write(json.dumps(audit_entry) + "\n")

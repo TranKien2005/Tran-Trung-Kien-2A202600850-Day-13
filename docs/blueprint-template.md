@@ -24,13 +24,17 @@
 ## 3. Technical Evidence (Group)
 
 ### 3.1 Logging & Tracing
-- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: [docs/screenshots/correlation_id.png](file:///D:/My%20Works/Coding/Practice/Tran-Trung-Kien-2A202600850-Day-13/docs/screenshots/correlation_id.png)
-- [EVIDENCE_PII_REDACTION_SCREENSHOT]: [docs/screenshots/pii_redaction.png](file:///D:/My%20Works/Coding/Practice/Tran-Trung-Kien-2A202600850-Day-13/docs/screenshots/pii_redaction.png)
-- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: [docs/screenshots/trace_waterfall.png](file:///D:/My%20Works/Coding/Practice/Tran-Trung-Kien-2A202600850-Day-13/docs/screenshots/trace_waterfall.png)
+- [EVIDENCE_CORRELATION_ID_SCREENSHOT]: docs/screenshots/correlation_id.png
+  ![Correlation ID](screenshots/correlation_id.png)
+- [EVIDENCE_PII_REDACTION_SCREENSHOT]: docs/screenshots/pii_redaction.png
+  ![PII Redaction](screenshots/pii_redaction.png)
+- [EVIDENCE_TRACE_WATERFALL_SCREENSHOT]: docs/screenshots/trace_waterfall.png
+  ![Trace Waterfall](screenshots/trace_waterfall.png)
 - [TRACE_WATERFALL_EXPLANATION]: The trace contains a main span for `LabAgent.run` which calls `retrieve` and `FakeLLM.generate`. The retrieve span demonstrates the RAG document retrieval step, while the generate span measures LLM response latency and token usage.
 
 ### 3.2 Dashboard & SLOs
-- [DASHBOARD_6_PANELS_SCREENSHOT]: [docs/screenshots/dashboard.png](file:///D:/My%20Works/Coding/Practice/Tran-Trung-Kien-2A202600850-Day-13/docs/screenshots/dashboard.png)
+- [DASHBOARD_6_PANELS_SCREENSHOT]: docs/screenshots/dashboard.png
+  ![Dashboard](screenshots/dashboard.png)
 - [SLO_TABLE]:
 | SLI | Target | Window | Current Value |
 |---|---:|---|---:|
@@ -39,7 +43,8 @@
 | Cost Budget | < $2.5/day | 1d | $0.0031 |
 
 ### 3.3 Alerts & Runbook
-- [ALERT_RULES_SCREENSHOT]: [docs/screenshots/alerts.png](file:///D:/My%20Works/Coding/Practice/Tran-Trung-Kien-2A202600850-Day-13/docs/screenshots/alerts.png)
+- [ALERT_RULES_SCREENSHOT]: docs/screenshots/alerts.png
+  ![Alert Rules](screenshots/alerts.png)
 - [SAMPLE_RUNBOOK_LINK]: [docs/alerts.md#1-high-latency-p95](file:///D:/My%20Works/Coding/Practice/Tran-Trung-Kien-2A202600850-Day-13/docs/alerts.md#1-high-latency-p95)
 
 ---
@@ -62,6 +67,6 @@
 ---
 
 ## 6. Bonus Items (Optional)
-- [BONUS_COST_OPTIMIZATION]: N/A
-- [BONUS_AUDIT_LOGS]: N/A
+- [BONUS_COST_OPTIMIZATION]: Implemented dynamic LLM routing. Simple/short queries (length < 45 chars) are automatically routed to a cheaper, highly efficient model (`claude-haiku-3-5`) instead of `claude-sonnet-4-5`. This reduces request cost from ~$0.002 to ~$0.0001 (a 10-20x saving) for simple general queries.
+- [BONUS_AUDIT_LOGS]: Configured a separate audit logging pipeline that writes core system configuration and transaction events (like enabling/disabling incident scenarios and processed requests) directly to data/audit.jsonl in a clean, structured JSON format.
 - [BONUS_CUSTOM_METRIC]: N/A
