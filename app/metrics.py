@@ -1,5 +1,4 @@
-from __future__ import annotations
-
+import time
 from collections import Counter
 from statistics import mean
 
@@ -10,6 +9,7 @@ REQUEST_TOKENS_OUT: list[int] = []
 ERRORS: Counter[str] = Counter()
 TRAFFIC: int = 0
 QUALITY_SCORES: list[float] = []
+REQUEST_TIMESTAMPS: list[float] = []
 
 
 def record_request(latency_ms: int, cost_usd: float, tokens_in: int, tokens_out: int, quality_score: float) -> None:
@@ -20,6 +20,7 @@ def record_request(latency_ms: int, cost_usd: float, tokens_in: int, tokens_out:
     REQUEST_TOKENS_IN.append(tokens_in)
     REQUEST_TOKENS_OUT.append(tokens_out)
     QUALITY_SCORES.append(quality_score)
+    REQUEST_TIMESTAMPS.append(time.time())
 
 
 
@@ -49,4 +50,22 @@ def snapshot() -> dict:
         "tokens_out_total": sum(REQUEST_TOKENS_OUT),
         "error_breakdown": dict(ERRORS),
         "quality_avg": round(mean(QUALITY_SCORES), 4) if QUALITY_SCORES else 0.0,
+        "history": [
+            {
+                "timestamp": t,
+                "latency": l,
+                "cost": c,
+                "tokens_in": ti,
+                "tokens_out": to,
+                "quality": q
+            }
+            for t, l, c, ti, to, q in zip(
+                REQUEST_TIMESTAMPS[-100:],
+                REQUEST_LATENCIES[-100:],
+                REQUEST_COSTS[-100:],
+                REQUEST_TOKENS_IN[-100:],
+                REQUEST_TOKENS_OUT[-100:],
+                QUALITY_SCORES[-100:]
+            )
+        ]
     }

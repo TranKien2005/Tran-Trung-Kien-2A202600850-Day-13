@@ -3,7 +3,7 @@ from __future__ import annotations
 import os
 
 from fastapi import FastAPI, HTTPException, Request
-from fastapi.responses import JSONResponse
+from fastapi.responses import HTMLResponse, JSONResponse
 from structlog.contextvars import bind_contextvars
 
 from .agent import LabAgent
@@ -20,6 +20,14 @@ log = get_logger()
 app = FastAPI(title="Day 13 Observability Lab")
 app.add_middleware(CorrelationIdMiddleware)
 agent = LabAgent()
+
+
+@app.get("/dashboard", response_class=HTMLResponse)
+async def dashboard_page() -> HTMLResponse:
+    dashboard_path = os.path.join(os.path.dirname(__file__), "templates", "dashboard.html")
+    with open(dashboard_path, "r", encoding="utf-8") as f:
+        html_content = f.read()
+    return HTMLResponse(content=html_content)
 
 
 @app.on_event("startup")
@@ -44,9 +52,15 @@ async def metrics() -> dict:
 
 @app.post("/chat", response_model=ChatResponse)
 async def chat(request: Request, body: ChatRequest) -> ChatResponse:
-    # TODO: Enrich logs with request context (user_id_hash, session_id, feature, model, env)
-    # bind_contextvars(...)
-    
+    # Enrich logs with request context (user_id_hash, session_id, feature, model, env)
+    bind_contextvars(
+        user_id_hash=hash_user_id(body.user_id),
+        session_id=body.session_id,
+        feature=body.feature,
+        model=agent.model,
+        env=os.getenv("APP_ENV", "dev"),
+    )
+
     log.info(
         "request_received",
         service="api",
@@ -59,6 +73,11 @@ async def chat(request: Request, body: ChatRequest) -> ChatResponse:
             session_id=body.session_id,
             message=body.message,
         )
+        try:
+            from langfuse.decorators import langfuse_context
+            langfuse_context.flush()
+        except Exception:
+            pass
         log.info(
             "response_sent",
             service="api",
